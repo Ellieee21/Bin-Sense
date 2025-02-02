@@ -1,10 +1,8 @@
-
 #include <CheapStepper.h>
 #include <Servo.h>
 Servo servo1;
 #define ir 5
 #define proxi 6
-#define buzzer 12
 int potPin = A0; //input pin
 int soil=0;
 int fsoil;
@@ -72,7 +70,6 @@ if(digitalRead(ir)==0)
               } 
 
       else {
-         tone(buzzer, 1000, 500);
            delay(1000);
             servo1.write(180);
               delay(1000);
