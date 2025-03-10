@@ -1,0 +1,66 @@
+#include <Stepper.h>
+#include <Servo.h>
+Servo servo1;
+#define ir 5
+#define proxi 6
+#define constrain(amt,low,high)
+int sensorRead=0;
+
+Stepper Stepper (SREG_S, 8, 9, 10, 11);
+
+int stepCount = 0;
+
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(A0,  INPUT);
+  pinMode(proxi, INPUT_PULLUP);
+  pinMode(ir, INPUT);
+  servo1.attach(7);
+  servo1.write(180);
+delay(1000);
+servo1.write(70);
+delay(1000);
+  
+}
+
+void loop() 
+{
+ int sensorRead= analogRead(A0);
+ Serial.print(sensorRead);
+  int L =digitalRead(proxi);
+Serial.print(L);
+if(L==0)
+
+{
+  Stepper.step(1);
+  Serial.print("steps:");
+  Serial.println(stepCount);
+  stepCount++;
+  delay(500);
+servo1.write(180);
+delay(1000);
+servo1.write(70);
+delay(1000);
+delay(1000); 
+} 
+
+if(digitalRead(ir)==0)
+{
+int sensorRead= analogRead(A0);
+Serial.println(sensorRead);
+}
+    if(sensorRead>20)
+           {            
+              servo1.write(180);
+              delay(1000);
+              servo1.write(70);
+                delay(1000);
+              } 
+
+      else {
+            servo1.write(180);
+              delay(1000);
+              servo1.write(70);
+                delay(1000);}
+}
