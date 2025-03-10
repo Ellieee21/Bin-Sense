@@ -1,0 +1,49 @@
+#include <Servo.h>
+#define sensor_DO A0
+#define dirPin 2
+#define stepPin 3
+#define stepsPerRevolution 200
+
+int IRSensor = 9; // IR sensor module
+int LED = 13; // LED indicator
+int wetSensor = A0; // Rain sensor for wet/dry detection
+
+Servo myservo; // Servo for bin lid
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("System Initialized");
+
+  pinMode(IRSensor, INPUT);
+  pinMode(LED, OUTPUT);
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+
+  myservo.attach(9);
+}
+
+void loop() {
+  int objectDetected = digitalRead(IRSensor);
+  int wetValue = analogRead(wetSensor);
+  Serial.print("Wet Sensor Value: ");
+  Serial.println(wetValue);
+
+  if (objectDetected == HIGH) {
+    digitalWrite(LED, HIGH);
+    delay(500);
+    
+    if (wetValue > 500) { // Threshold for wet waste
+      Serial.println("Wet Waste Detected");
+      myservo.write(90); // Move servo to wet bin position
+    } else {
+      Serial.println("Dry Waste Detected");
+      myservo.write(0); // Move servo to dry bin position
+    }
+    
+    delay(1000);
+    myservo.write(45); // Reset position
+  }
+  else {
+    digitalWrite(LED, LOW);
+  }
+}
