@@ -1,0 +1,44 @@
+#include <Adafruit_VCNL4010.h>
+#include <Servo.h>
+#define sensor_DO A0
+#define dirPin 2
+#define stepPin 3
+#define stepsPerRevolution 200
+
+int IRSensor = 9; // connect IR sensor module to Arduino pin D9
+int LED = 13; // connect LED to Arduino pin 13
+int potpin = 0;  // analog pin used to connect the potentiometer
+int val;    // variable to read the value from the analog pin
+
+Servo myservo; // Declare the servo object
+
+void setup()
+{
+  Serial.begin(115200); // Init Serial at 115200 Baud Rate.
+  Serial.println("Serial Working"); // Test to check if serial is working or not
+
+  pinMode(IRSensor, INPUT); // IR Sensor pin INPUT
+  pinMode(LED, OUTPUT); // LED Pin Output
+
+  myservo.attach(9);  // attaches the servo on pin 9 to the servo object
+
+  // Declare pins as output for motor and driver:
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+}
+
+void loop()
+{
+  int val = digitalRead(sensor_DO); // for raindrop until (val)
+  Serial.print("Digital Output: ");
+  Serial.print(val);
+
+  if (val == 1) // Corrected comparison operator
+  {
+    digitalWrite(LED, HIGH); // Turn LED on
+  }
+  else
+  {
+    digitalWrite(LED, LOW); // Turn LED off
+  }
+}
