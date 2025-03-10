@@ -1,0 +1,47 @@
+#include <Servo.h>
+#define sensor_DO A0
+#define dirPin 2
+#define stepPin 3
+#define stepsPerRevolution 200
+
+int IRSensor = 9; // IR sensor for object detection
+int proximitySwitch = 7; // Proximity switch for metal detection
+int wetSensor = A0; // Rain sensor for wet/dry detection
+
+Servo myservo; // Servo for bin lid
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Automated Trashcan Initialized");
+
+  pinMode(IRSensor, INPUT);
+  pinMode(proximitySwitch, INPUT);
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
+
+  myservo.attach(9); // Servo connected to pin 9
+}
+
+void loop() {
+  int objectDetected = digitalRead(IRSensor);
+  int wetValue = analogRead(wetSensor);
+  int metalDetected = digitalRead(proximitySwitch);
+
+  if (objectDetected == HIGH) {
+    Serial.println("Waste Detected");
+
+    if (wetValue > 500) { // Wet waste threshold
+      Serial.println("Wet Waste Detected");
+      myservo.write(90); // Move servo to wet bin
+    } else if (metalDetected == HIGH) {
+      Serial.println("Metal Waste Detected");
+      myservo.write(135); // Move servo to metal bin
+    } else {
+      Serial.println("Dry Waste Detected");
+      myservo.write(0); // Move servo to dry bin
+    }
+
+    delay(1000);
+    myservo.write(45); // Reset position after sorting
+  }
+}
