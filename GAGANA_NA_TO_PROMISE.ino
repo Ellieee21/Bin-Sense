@@ -3,7 +3,6 @@
 Servo servo1;
 #define ir 5
 #define proxi 6
-#define buzzer 12
 int potPin = A0; //input pin
 int soil=0;
 int fsoil;
@@ -31,7 +30,6 @@ void loop()
 Serial.print(L);
 if(L==0)
 {
-  tone(buzzer, 1000, 1000);
  stepper.moveDegreesCW (240);
 delay(1000); 
 servo1.write(180);
@@ -44,7 +42,6 @@ delay(1000);
 
 if(digitalRead(ir)==0)
 {
-   tone(buzzer, 1000, 500);
    delay(1000);
   int soil=0;
   for(int i=0;i<3;i++)
@@ -71,12 +68,10 @@ if(digitalRead(ir)==0)
               } 
 
       else {
-         tone(buzzer, 1000, 500);
            delay(1000);
             servo1.write(180);
               delay(1000);
               servo1.write(70);
                 delay(1000);}
 }
-
 }
