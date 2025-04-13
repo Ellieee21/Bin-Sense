@@ -1,0 +1,86 @@
+#include <LiquidCrystal.h>
+#include <Servo.h>
+#include <Stepper.h>
+
+// LCD setup (RS, E, D4, D5, D6, D7)
+LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+
+// Servo setup
+Servo doorServo;
+
+// Stepper motor setup
+const int stepsPerRevolution = 2048; // for 28BYJ-48 stepper motor
+Stepper stepper(stepsPerRevolution, 2, 3, 4, 5); // IN1-IN4 connected to pins 2-5
+
+// Sensor pins
+const int rainSensorPin = A0;
+const int proximityPin = A1;
+const int irSensorPin = A2;
+
+// Servo angles
+const int doorOpenWet = 30;   // Example angle for wet
+const int doorOpenDry = 90;   // Example angle for dry and metal
+const int doorClosed = 0;
+
+// Waste thresholds
+const int wetThreshold = 500;
+
+void setup() {
+  lcd.begin(16, 2);
+  doorServo.attach(6);  // Servo connected to pin 6
+  stepper.setSpeed(15); // Set speed in RPM
+
+  pinMode(proximityPin, INPUT);
+  pinMode(irSensorPin, INPUT);
+
+  lcd.print("System Ready");
+  delay(2000);
+  lcd.clear();
+}
+
+void loop() {
+  int rainValue = analogRead(rainSensorPin);
+  int proximityVal = digitalRead(proximityPin);
+  int irVal = digitalRead(irSensorPin);
+
+  if (rainValue >= wetThreshold) {
+    lcd.clear();
+    lcd.print("Wet Waste");
+    rotateStepper(180, true); // Right
+    operateDoor(doorOpenWet);
+    resetStepper();
+  }
+  else if (proximityVal == HIGH && irVal == HIGH) {
+    lcd.clear();
+    lcd.print("Metal Waste");
+    rotateStepper(120, false); // Left
+    operateDoor(doorOpenDry);
+    resetStepper();
+  }
+  else if (rainValue < wetThreshold) {
+    lcd.clear();
+    lcd.print("Dry Waste");
+    rotateStepper(240, false); // Left
+    operateDoor(doorOpenDry);
+    resetStepper();
+  }
+
+  delay(1000); // Small delay before next loop
+}
+
+void rotateStepper(int degrees, bool right) {
+  int steps = map(degrees, 0, 360, 0, stepsPerRevolution);
+  stepper.step(right ? steps : -steps);
+}
+
+void operateDoor(int angle) {
+  doorServo.write(angle);
+  delay(1000); // Hold open
+  doorServo.write(doorClosed);
+  delay(500); // Reset time
+}
+
+void resetStepper() {
+  // Automatically reset to original position
+  stepper.step(-stepsPerRevolution); // Simple full rotation back
+}
