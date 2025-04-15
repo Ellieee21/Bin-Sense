@@ -1,0 +1,46 @@
+void loop() {
+  int rainValue = analogRead(raindropPin);
+  int proximityVal = digitalRead(proximityPin);
+  int irVal = digitalRead(irSensorPin);
+
+  // ✅ Metal Waste: Only if BOTH sensors detect
+  if (proximityVal == HIGH && irVal == HIGH) {
+    lcd.clear();
+    lcd.print("Metal Waste");
+
+    stepper.step(-120);          // Stepper: 120 steps left
+    servo.write(180);            // Servo: open right
+    delay(1000);
+    servo.write(90);             // Close
+    delay(2000);
+    resetStepper();
+  }
+
+  // ✅ Wet Waste
+  else if (rainValue > 350) {
+    lcd.clear();
+    lcd.print("Wet Waste");
+
+    stepper.step(180);           // Stepper: 180 steps right
+    servo.write(0);              // Servo: open left
+    delay(1000);
+    servo.write(90);
+    delay(2000);
+    resetStepper();
+  }
+
+  // ✅ Dry Waste (raindrop == 1023 exactly)
+  else if (rainValue == 1023) {
+    lcd.clear();
+    lcd.print("Dry Waste");
+
+    stepper.step(-240);          // Stepper: 240 steps left
+    servo.write(180);            // Servo: open right
+    delay(1000);
+    servo.write(90);
+    delay(2000);
+    resetStepper();
+  }
+
+  delay(500); // Small buffer between reads
+}
